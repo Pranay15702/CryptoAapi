@@ -14,10 +14,10 @@ LOCAL_IPV6 = '44:2f:bd:7d:d9'
 REMOTE_PORTS = [3341, 3333, 3334, 3357, 80, 443]
 feature_col = ["int_time", "pkt_size", "mm_it", "mm_ps", "mstd_it", "mstd_ps"]
 
-application = Flask(__name__)
+app = Flask(__name__)
 
 
-@application.route("/prediction", methods=["POST"])
+@app.route("/prediction", methods=["POST"])
 
 
 #define function
@@ -84,4 +84,4 @@ if __name__ == "__main__":
     print ("Model loaded")
     rnd_columns = pickle.load(open("rnd_columns.pkl", "rb")) # Load “rnd_columns.pkl”
     print ("Model columns loaded")
-    application.run(port=port, debug=True)
+    app.run(port=port, debug=True)
