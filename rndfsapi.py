@@ -5,9 +5,7 @@ import traceback
 import pandas as pd
 from sklearn import preprocessing
 import xgboost as xgb
-import numpy as np
 import sys
-import pyshark
 
 #LOCAL_IP = '192.168.0.103'
 #LOCAL_IPV6 = 'fe80::a580:6360:f23b:33c3%10'
