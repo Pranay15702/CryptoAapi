@@ -27,11 +27,7 @@ def predict():
     booster = xgb.Booster()
     booster.load_model('xgb_x_rs_3_24_booster_bin.bin')
     lr._Booster = booster
-    #lr._le = preprocessing.LabelEncoder().fit([0, 1])
-    print ("Model loaded")
     rnd_columns = pickle.load(open("rnd_columns.pkl", "rb")) # Load “rnd_columns.pkl”
-    print ("Model columns loaded")
-    app.run(port=port, debug=True)
     df = pd.DataFrame(t, columns=['int_time', 'pkt_size'])
     df['mm_it'] = df['int_time'].rolling(window=5).mean()
     df['mm_ps'] = df['pkt_size'].rolling(window=5).mean()
