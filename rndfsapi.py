@@ -18,31 +18,20 @@ app = Flask(__name__)
 
 
 @app.route("/prediction", methods=["POST"])
-
-
-#define function
 def predict():
-    if lr:
-        try:
-            #json_ = request.json
-            json_ = data_man()
-            #print(json_)
-            #query = pd.get_dummies(pd.DataFrame(json_))
-            query = pd.read_json(json_)
-            query = query.reindex(columns=rnd_columns)
-
-            predict = list(lr.predict(query))
-            return jsonify({"prediction": str(list(i for i in predict))})
-        except:
-            return jsonify({"trace": traceback.format_exc()})
-    else:
-        print ("Model not good")
-        return "Model is not good"
-
-
-
-
-def data_man():
+     t = [[0.10321593284606934, 52], [0.09416317939758301, 40], [0.005105018615722656, 4360], [0.0, 499],
+        [0.0948488712310791, 314], [0.0, 607], [0.007678985595703125, 52], [0.21971392631530762, 40],
+        [0.00067901611328125, 2920], [0.0006148815155029297, 1256], [0.0, 52], [0.0, 1480],
+        [0.0001709461212158203, 664], [0.30251288414001465, 91], [0.0, 40]]
+    lr = xgb.XGBClassifier()
+    booster = xgb.Booster()
+    booster.load_model('xgb_x_rs_3_24_booster_bin.bin')
+    lr._Booster = booster
+    #lr._le = preprocessing.LabelEncoder().fit([0, 1])
+    print ("Model loaded")
+    rnd_columns = pickle.load(open("rnd_columns.pkl", "rb")) # Load “rnd_columns.pkl”
+    print ("Model columns loaded")
+    app.run(port=port, debug=True)
     df = pd.DataFrame(t, columns=['int_time', 'pkt_size'])
     df['mm_it'] = df['int_time'].rolling(window=5).mean()
     df['mm_ps'] = df['pkt_size'].rolling(window=5).mean()
@@ -61,27 +50,15 @@ def data_man():
 
     X_arr = stnd.fit_transform(X)
     X = pd.DataFrame(X_arr, columns=feature_col)
-    return X.to_json(orient="records")
-    
-
-if __name__ == "__main__":
     try:
-        port = int(sys.argv[1])
+        #json_ = request.json
+        json_ = X.to_json(orient="records")
+        #print(json_)
+        #query = pd.get_dummies(pd.DataFrame(json_))
+        query = pd.read_json(json_)
+        query = query.reindex(columns=rnd_columns)
+
+        predict = list(lr.predict(query))
+        return jsonify({"prediction": str(list(i for i in predict))})
     except:
-        port = 12345
-    #capt = pyshark.LiveCapture(interface='Wi-Fi')
-    #capt = pyshark.FileCapture('fludg8.000webhostapp_pcap.pcap')
-    t = [[0.10321593284606934, 52], [0.09416317939758301, 40], [0.005105018615722656, 4360], [0.0, 499],
-        [0.0948488712310791, 314], [0.0, 607], [0.007678985595703125, 52], [0.21971392631530762, 40],
-        [0.00067901611328125, 2920], [0.0006148815155029297, 1256], [0.0, 52], [0.0, 1480],
-        [0.0001709461212158203, 664], [0.30251288414001465, 91], [0.0, 40]]
-    #lr = pickle.load(open("xgb_x_rs_3_24_booster_bin.bin", "rb"))
-    lr = xgb.XGBClassifier()
-    booster = xgb.Booster()
-    booster.load_model('xgb_x_rs_3_24_booster_bin.bin')
-    lr._Booster = booster
-    #lr._le = preprocessing.LabelEncoder().fit([0, 1])
-    print ("Model loaded")
-    rnd_columns = pickle.load(open("rnd_columns.pkl", "rb")) # Load “rnd_columns.pkl”
-    print ("Model columns loaded")
-    app.run(port=port, debug=True)
+        return jsonify({"trace": traceback.format_exc()})
